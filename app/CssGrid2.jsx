@@ -36,9 +36,14 @@ function computeNumRowsNeeded(imageList) {
 export function CssGrid2() {
 
     const divImages = image_names.map(image => {
-      let cl = "bg-teal-500";
-      cl = cl + ' col-span-' + image.cols + ' row-span-' + image.rows + ' bg-cover';
-      return <div key={image.name} class={cl}><img src={getFilename(image.name)} alt={"photo of a " + image.name} />{image.name}<br />{image.comment}</div> 
+      let cl = "bg-teal-500 ";
+      cl = cl + ' col-span-' + image.cols + ' row-span-' + image.rows + ' relative';
+      return (
+        <div key={image.name} class={cl}>
+          <img class="bg-cover absolute top-0" src={getFilename(image.name)} alt={"photo of a " + image.name} />
+          <div class="absolute bottom-0 opacity-70 bg-slate-300 min-w-full">{image.comment}</div>
+        </div>
+      )
       }
     );
     
@@ -47,7 +52,6 @@ export function CssGrid2() {
     return (
       <div class={gridClass}>
         {divImages}
-        <div>This packs into {numRows} rows.</div>
       </div>
     );
   };
