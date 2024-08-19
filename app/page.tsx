@@ -1,3 +1,5 @@
+'use client';
+
 import { CssGrid1 } from './CssGrid1.jsx';
 import { CssGrid2 } from './CssGrid2.jsx';
 
