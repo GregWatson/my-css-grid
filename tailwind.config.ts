@@ -37,6 +37,7 @@ module.exports = {
   safelist: [
     "col-span-2",
     "col-span-3",
+    "col-span-6",
     "row-span-2",
     "row-span-3",
     ...safeColors,

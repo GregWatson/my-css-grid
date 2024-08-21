@@ -4,6 +4,7 @@ import { getFilename, image_names, menuData } from "./data.jsx";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { maxTranslate } from "../tailwind.config";
+import { ImageSizeSelect } from "./ImageSizeSelect.jsx"
 
 /* Compute the number of rows needed to display the images
    assuming no back-filling for smaller images. Might need fewer
@@ -47,17 +48,8 @@ export function CssGrid2() {
     y: 0,
   });
   
-  function ModalContent({ onClose }) {
-    let cl = "max-w-sm rounded-lg border-2 border-black shadow-lg top-0 left-0 bg-red-200 z-[100]";
-    cl = cl + " relative translate-x-" + rightClicked.x + " translate-y-" + rightClicked.y;
-    // let cl = "flex items-center relative top-0 left-0 bg-red-200 translate-x-20 translate-y-10"
-    return (
-      <div class={cl}>
-        <div>
-          <p> X = {rightClicked.x} Y = {rightClicked.y}</p>
-        </div>
-      </div>
-    );
+  function ModalContent( ) {
+    return <ImageSizeSelect rightClicked={rightClicked} setRightClicked={setRightClicked} />
   }
 
   function setClicked(val) {
@@ -82,7 +74,7 @@ export function CssGrid2() {
 
   const divImages = imageInfo.map((image) => {
     let cl =
-      "rounded-lg border-2 border-slate-500 hover:border-4 hover:border-slate-800";
+      "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800";
     cl =
       cl + " col-span-" + image.cols + " row-span-" + image.rows + " relative";
 
@@ -137,7 +129,7 @@ export function CssGrid2() {
     "grid grid-cols-[repeat(3,300px)] grid-rows-[repeat(5,_300px)] gap-1";
 
   return (
-    <div class={gridClass} id="imgGrid">
+    <div class={gridClass}>
       {divImages}
       {rightClicked.clicked &&
         createPortal(
