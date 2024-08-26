@@ -8,7 +8,7 @@ import { ImageSizeSelect } from "./ImageSizeSelect.jsx"
 
 /* Compute the number of rows needed to display the images
    assuming no back-filling for smaller images. Might need fewer
-   but that's OK.
+   rows than computed but that's OK.
 */
 function computeNumRowsNeeded(imageList) {
   let numRows = 0; // Running total in grid
@@ -19,10 +19,10 @@ function computeNumRowsNeeded(imageList) {
   imageList.forEach((image) => {
     let i_rows = +image.rows;
     let i_cols = +image.cols;
-    if (i_cols > colsLeft) {
+    if (i_cols > colsLeft) { // cannot add to current row.
       numRows = numRows + numRowsUsed;
-      colsLeft = numCols;
-      numRowsUsed = 1;
+      colsLeft = numCols - i_cols;
+      numRowsUsed = i_rows;
     } else {
       colsLeft = colsLeft - i_cols;
       if (i_rows > numRowsUsed) numRowsUsed = i_rows;
@@ -42,34 +42,37 @@ function computeNumRowsNeeded(imageList) {
 export function CssGrid2() {
   const [imageInfo, setImageInfo] = useState(image_names);
   const [rightClicked, setRightClicked] = useState({
-    clicked: false,
     imageID: "No Image",
     x: 0,
     y: 0,
+    cols: 0,
+    rows: 0
   });
-  
+  const statusVals = ['noneSelected', 'modalActiveOnImage', 'resizeImage'];
+  const [status, setStatus] = useState('noneSelected');
+
+  if (status === "resizeImage") {
+    console.log("RESIZE IMAGE: image %s  cols:%d  rows:%d", rightClicked.imageID, rightClicked.cols, rightClicked.rows);
+    let newImageInfo = imageInfo.map((image) => {
+      if (image.name === rightClicked.imageID) 
+        return {...image,
+          cols:rightClicked.cols,
+          rows:rightClicked.rows
+        }
+      else return image
+    })
+    setImageInfo(newImageInfo)
+    setStatus('noneSelected')
+  }
+
   function ModalContent( ) {
-    return <ImageSizeSelect rightClicked={rightClicked} setRightClicked={setRightClicked} />
-  }
-
-  function setClicked(val) {
-    setRightClicked({ ...rightClicked, clicked: val });
-  }
-
-  function handleClick(imageID) {
-    console.log("Clicked on image %s", imageID);
-    return <p>Hi there</p>;
-  }
-
-  function handleMouseLeave(imageID) {
-    const nextImageInfo = imageInfo.map((image) => {
-      if (image.name === imageID) {
-        image.hover = false;
-      }
-      return image;
-    });
-    setImageInfo(nextImageInfo);
-    console.log("Exited %s", imageID);
+    return (
+      <ImageSizeSelect  rightClicked={rightClicked} 
+                        setRightClicked={setRightClicked} 
+                        setStatus={setStatus} 
+                        imageInfo={imageInfo}
+                        setImageInfo={setImageInfo}
+    /> )
   }
 
   const divImages = imageInfo.map((image) => {
@@ -78,29 +81,38 @@ export function CssGrid2() {
     cl =
       cl + " col-span-" + image.cols + " row-span-" + image.rows + " relative";
 
+    console.log("Image %s had cols: %s and rows: %s", image.name, image.cols, image.rows)
+
     return (
       <div
         id={image.name}
         key={image.name}
         class={cl}
+        onClick = {() => {
+          if (status === 'modalActiveOnImage') {
+            setStatus("noneSelected")
+          }}
+        }
         onContextMenu={(e) => {
           e.preventDefault(); // prevent the default behaviour when right clicked
           let X = Math.round((e.pageX - e.currentTarget.offsetLeft) / 4);
           let Y = Math.round((e.pageY - e.currentTarget.offsetTop) / 4);
           if (X > maxTranslate) { X = maxTranslate-1}
           if (Y > maxTranslate) { Y = maxTranslate-1}
-          setRightClicked({
-            clicked: true,
-            imageID: image.name,
-            x: X,
-            y: Y
-          });
-          console.log(
-            "click:  image %s  (%d,%d)",
-            image.name,
-            X,
-            Y
-          );
+          if (status === "noneSelected") {
+            setRightClicked({
+              ...rightClicked,
+              imageID: image.name,
+              x: X,
+              y: Y
+            });
+            setStatus('modalActiveOnImage')
+          } else {
+            // already modalActiveOnImage?
+            if (status === "modalActiveOnImage") {
+              setStatus("noneSelected")
+            }
+          }
         }}
       >
         <img
@@ -111,33 +123,23 @@ export function CssGrid2() {
         <div class="absolute bottom-0 opacity-70 bg-slate-300 min-w-full">
           {image.comment}
         </div>
-        {image.hover ? (
-          <div class="absolute top-1 left-1 rounded indent-2  bg-black text-white ">
-            <div class="font-bold">Editing options</div>
-            <ul>
-              <li>Click and hold mouse to move image.</li>
-              <li>Right click image to resize.</li>
-            </ul>
-          </div>
-        ) : null}
       </div>
     );
   });
 
   let numRows = computeNumRowsNeeded(imageInfo);
   let gridClass =
-    "grid grid-cols-[repeat(3,300px)] grid-rows-[repeat(5,_300px)] gap-1";
+    "grid grid-cols-[repeat(3,300px)] grid-rows-[repeat(" + numRows.toString() + ",_300px)] gap-1";
 
   return (
     <div class={gridClass}>
       {divImages}
-      {rightClicked.clicked &&
+      {status === "modalActiveOnImage" &&
         createPortal(
-          <ModalContent onClose={() => setClicked(false)} />,
+          <ModalContent onClose={() => (status === "modalActiveOnImage") ? setStatus('noneSelected') : {} } />,
           document.getElementById(rightClicked.imageID)
-        )}
+      )}
     </div>
   );
 }
 
-//             <div  class='absolute bg-red-200 translate-x-[var(--mouse-x)] translate-y-[var(--mouse-y)]' >

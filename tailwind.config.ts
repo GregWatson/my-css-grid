@@ -25,6 +25,12 @@ for (let count = 13; count < maxTranslate; count++) {
   trObj[count.toString()] = r.toString() + 'rem'
 }
 
+const maxGridRows = 50;
+var gridRowsArray: any[] = [];
+for (let count = 0; count < maxGridRows; count++) {
+  gridRowsArray = gridRowsArray.concat(["grid-rows-[repeat(" + count + ",_300px)]"])
+}
+
 console.log("tailwind.config.ts executed.");
 
 module.exports = {
@@ -42,6 +48,7 @@ module.exports = {
     "row-span-3",
     ...safeColors,
     ...tempArray,
+    ...gridRowsArray,
     "z-100"
   ],
   theme: {
