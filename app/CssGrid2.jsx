@@ -40,6 +40,7 @@ function computeNumRowsNeeded(imageList) {
 
 
 export function CssGrid2() {
+  const gridImageSize = "300"; // px. Need to update in tailwind.config.ts as well.
   const [imageInfo, setImageInfo] = useState(image_names);
   const [rightClicked, setRightClicked] = useState({
     imageID: "No Image",
@@ -129,7 +130,7 @@ export function CssGrid2() {
 
   let numRows = computeNumRowsNeeded(imageInfo);
   let gridClass =
-    "grid grid-cols-[repeat(3,300px)] grid-rows-[repeat(" + numRows.toString() + ",_300px)] gap-1";
+    "grid grid-cols-[repeat(3," + gridImageSize + "px)] grid-rows-[repeat(" + numRows.toString() + ",_" + gridImageSize + "px)] gap-1";
 
   return (
     <div class={gridClass}>
