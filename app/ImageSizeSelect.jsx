@@ -5,9 +5,7 @@ import { useState } from "react";
 export function ImageSizeSelect({
   rightClicked,
   setRightClicked,
-  setStatus,
-  imageInfo,
-  setImageInfo,
+  setStatus
 }) {
   // possible image sizes in [columns, rows]
   const sizes = [
@@ -29,9 +27,9 @@ export function ImageSizeSelect({
     let numRows = size[1];
     let imageID = rightClicked.imageID;
     let cl =
-      "rounded-lg border-2 border-slate-400 bg-slate-200 hover:border-4 hover:border-slate-800";
+      "rounded-lg border-2 border-slate-400 bg-sky-500 hover:border-4 hover:border-slate-800";
     if (numCols === 6) {
-      cl = "bg-slate-500 text-center";
+      cl = "bg-sky-200 text-center";
     }
     cl = cl + " col-span-" + numCols + " row-span-" + numRows + " relative";
     return (
@@ -42,18 +40,18 @@ export function ImageSizeSelect({
           e.stopPropagation();
           console.log("Resize: Image '%s' to %d cols by %d rows.", imageID, numCols, numRows );
           setRightClicked({...rightClicked, cols:numCols.toString(), rows:numRows.toString()});
-          setStatus('resizeImage')
+          if (numCols === 6) setStatus('noneSelected')
+          else setStatus('resizeImage')
         }}
       >
-        {numCols === 6 ? "Select Size (" + imageID + ")" : null}
+        {numCols === 6 ? "Resize Image" : null}
       </div>
     );
   });
 
   let gridClass =
-    "grid rounded grid-cols-[repeat(6,30px)] grid-rows-[repeat(7,30px)] " +
-    "gap-1 z-30 max-w-min relative translate-x-" + 
-    rightClicked.x + " translate-y-" + rightClicked.y;
+    "p-1 border-2 border-sky-800 grid rounded grid-cols-[repeat(6,30px)] grid-rows-[repeat(7,30px)] " +
+    "gap-1 z-30 max-w-min";
 
   return (
     <div

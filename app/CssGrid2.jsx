@@ -49,7 +49,8 @@ export function CssGrid2() {
     cols: 0,
     rows: 0
   });
-  const statusVals = ['noneSelected', 'modalActiveOnImage', 'resizeImage'];
+
+  // const statusVals = ['noneSelected', 'modalActiveOnImage', 'resizeImage', 'isDragging'];
   const [status, setStatus] = useState('noneSelected');
 
   if (status === "resizeImage") {
@@ -67,13 +68,24 @@ export function CssGrid2() {
   }
 
   function ModalContent( ) {
-    return (
-      <ImageSizeSelect  rightClicked={rightClicked} 
-                        setRightClicked={setRightClicked} 
-                        setStatus={setStatus} 
-                        imageInfo={imageInfo}
-                        setImageInfo={setImageInfo}
-    /> )
+    let cl="z-20 w-min p-1 space-y-1 bg-sky-200 relative translate-x-" + rightClicked.x + " translate-y-" + rightClicked.y;
+    return ( 
+      <div class={cl}>
+        <button class="min-w-full p-1 rounded bg-sky-500 text-center  border-2 border-sky-800 "
+        onClick = {(e) => {
+          console.log("Move Button was clicked"); 
+          setStatus("isDragging")}
+          }
+        >
+          Move Image
+        </button>
+        <ImageSizeSelect  rightClicked={rightClicked} 
+                          setRightClicked={setRightClicked} 
+                          setStatus={setStatus} 
+                          imageInfo={imageInfo}
+                          setImageInfo={setImageInfo}
+        />
+      </div> )
   }
 
   const divImages = imageInfo.map((image) => {
@@ -84,13 +96,16 @@ export function CssGrid2() {
 
     console.log("Image %s had cols: %s and rows: %s", image.name, image.cols, image.rows)
 
+    let imageCL = "bg-cover absolute top-0 ";
+    if (status === "isDragging") imageCL += "blur-sm";
+
     return (
       <div
         id={image.name}
         key={image.name}
         class={cl}
         onClick = {() => {
-          if (status === 'modalActiveOnImage') {
+          if ((status === 'modalActiveOnImage') | (status === "isDragging")) {
             setStatus("noneSelected")
           }}
         }
@@ -115,9 +130,11 @@ export function CssGrid2() {
             }
           }
         }}
+        onDragEnter= {(e) => { console.log("Drag Enter %s", image.name) }}
+        onDragLeave= {(e) => { console.log("Drag Leave %s", image.name) }}
       >
         <img
-          class="bg-cover absolute top-0"
+          class={imageCL}
           src={getFilename(image.name)}
           alt={"photo of a " + image.name}
         />
