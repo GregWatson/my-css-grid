@@ -34,12 +34,13 @@ function computeNumRowsNeeded(imageList) {
     }
   });
   if (colsLeft !== numCols) numRows = numRows + numRowsUsed;
-  console.log("Info: Used %d rows.", numRows);
+  // console.log("Info: Used %d rows.", numRows);
   return numRows;
 }
 
 
 export function CssGrid2() {
+  const gridImageSize = "300"; // px. Need to update in tailwind.config.ts as well.
   const [imageInfo, setImageInfo] = useState(image_names);
   const [rightClicked, setRightClicked] = useState({
     imageID: "No Image",
@@ -48,7 +49,11 @@ export function CssGrid2() {
     cols: 0,
     rows: 0
   });
-  const statusVals = ['noneSelected', 'modalActiveOnImage', 'resizeImage'];
+
+  // dragInfo used when reOrdering images via DnD
+  const [dragSrcImageID, setDragSrcImageID ] = useState("");
+
+  // const statusVals = ['noneSelected', 'modalActiveOnImage', 'resizeImage', 'isDragging'];
   const [status, setStatus] = useState('noneSelected');
 
   if (status === "resizeImage") {
@@ -66,13 +71,64 @@ export function CssGrid2() {
   }
 
   function ModalContent( ) {
-    return (
-      <ImageSizeSelect  rightClicked={rightClicked} 
-                        setRightClicked={setRightClicked} 
-                        setStatus={setStatus} 
-                        imageInfo={imageInfo}
-                        setImageInfo={setImageInfo}
-    /> )
+    let cl="z-20 w-min p-1 space-y-1 bg-sky-200 relative translate-x-" + rightClicked.x + " translate-y-" + rightClicked.y;
+    return ( 
+      <div class={cl}>
+        <button class="min-w-full p-1 rounded bg-sky-500 text-center  border-2 border-sky-800 "
+        onClick = {(e) => {
+          console.log("Move Button was clicked"); 
+          setStatus("isDragging")}
+          }
+        >
+          Move Image
+        </button>
+        <ImageSizeSelect  rightClicked={rightClicked} 
+                          setRightClicked={setRightClicked} 
+                          setStatus={setStatus} 
+                          imageInfo={imageInfo}
+                          setImageInfo={setImageInfo}
+        />
+      </div> )
+  }
+
+  // move srcImage to immediately before dstImage in the list
+  function moveImage(srcImageID, dstImageID) {
+    // get the src image object
+    let srcObj;
+    imageInfo.forEach((image) => {
+      if (image.name === srcImageID) srcObj = image;
+    });
+    // create new list
+    let newImageInfo = [];
+    imageInfo.forEach((image) => {
+      if (image.name === dstImageID) {
+        newImageInfo.push(srcObj); newImageInfo.push(image)
+      } else 
+        if (image.name !== srcImageID) newImageInfo.push(image) 
+
+    });
+    setImageInfo(newImageInfo)
+  }
+
+
+  // drop 
+  function handleOnDrop(dstImage) {
+    if ((dragSrcImageID === "") | (dstImage === "")) {
+      console.log("ERROR: tried to move (re-order) images but either src or dst is missing");
+    } else {
+      console.log("INFO: Moving image %s before image %s", dragSrcImageID, dstImage);
+      moveImage(dragSrcImageID, dstImage);
+    }
+    setStatus('noneSelected');
+    setDragSrcImageID('');
+  }
+
+  function handleOnDragEnd() {
+    if (status === "isDragging") {
+      console.log("Drag cancelled %s", dragSrcImageID);
+      setStatus('noneSelected');
+      setDragSrcImageID('');
+    }
   }
 
   const divImages = imageInfo.map((image) => {
@@ -81,7 +137,10 @@ export function CssGrid2() {
     cl =
       cl + " col-span-" + image.cols + " row-span-" + image.rows + " relative";
 
-    console.log("Image %s had cols: %s and rows: %s", image.name, image.cols, image.rows)
+    // console.log("Image %s had cols: %s and rows: %s", image.name, image.cols, image.rows)
+
+    let imageCL = "bg-cover absolute top-0 ";
+    if (status === "isDragging") imageCL += "blur-sm";
 
     return (
       <div
@@ -89,7 +148,7 @@ export function CssGrid2() {
         key={image.name}
         class={cl}
         onClick = {() => {
-          if (status === 'modalActiveOnImage') {
+          if ((status === 'modalActiveOnImage') | (status === "isDragging")) {
             setStatus("noneSelected")
           }}
         }
@@ -107,19 +166,18 @@ export function CssGrid2() {
               y: Y
             });
             setStatus('modalActiveOnImage')
-          } else {
-            // already modalActiveOnImage?
-            if (status === "modalActiveOnImage") {
-              setStatus("noneSelected")
-            }
           }
         }}
       >
         <img
-          class="bg-cover absolute top-0"
+          class={imageCL}
           src={getFilename(image.name)}
           alt={"photo of a " + image.name}
-        />
+          onDragStart= {(e) => { e.stopPropagation(); console.log("Drag Start %s", image.name); setDragSrcImageID(image.name) }}
+          onDragOver = {(e) => { e.stopPropagation(); e.preventDefault() }} // required
+          onDrop     = {(e) => { e.stopPropagation(); handleOnDrop(image.name) }}
+          onDragEnd  = {(e) => { e.stopPropagation(); handleOnDragEnd() }}
+          />
         <div class="absolute bottom-0 opacity-70 bg-slate-300 min-w-full">
           {image.comment}
         </div>
@@ -129,7 +187,7 @@ export function CssGrid2() {
 
   let numRows = computeNumRowsNeeded(imageInfo);
   let gridClass =
-    "grid grid-cols-[repeat(3,300px)] grid-rows-[repeat(" + numRows.toString() + ",_300px)] gap-1";
+    "grid grid-cols-[repeat(3," + gridImageSize + "px)] grid-rows-[repeat(" + numRows.toString() + ",_" + gridImageSize + "px)] gap-1";
 
   return (
     <div class={gridClass}>
