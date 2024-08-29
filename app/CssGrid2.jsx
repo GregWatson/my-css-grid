@@ -34,7 +34,7 @@ function computeNumRowsNeeded(imageList) {
     }
   });
   if (colsLeft !== numCols) numRows = numRows + numRowsUsed;
-  console.log("Info: Used %d rows.", numRows);
+  // console.log("Info: Used %d rows.", numRows);
   return numRows;
 }
 
@@ -49,6 +49,9 @@ export function CssGrid2() {
     cols: 0,
     rows: 0
   });
+
+  // dragInfo used when reOrdering images via DnD
+  const [dragSrcImageID, setDragSrcImageID ] = useState("");
 
   // const statusVals = ['noneSelected', 'modalActiveOnImage', 'resizeImage', 'isDragging'];
   const [status, setStatus] = useState('noneSelected');
@@ -88,13 +91,53 @@ export function CssGrid2() {
       </div> )
   }
 
+  // move srcImage to immediately before dstImage in the list
+  function moveImage(srcImageID, dstImageID) {
+    // get the src image object
+    let srcObj;
+    imageInfo.forEach((image) => {
+      if (image.name === srcImageID) srcObj = image;
+    });
+    // create new list
+    let newImageInfo = [];
+    imageInfo.forEach((image) => {
+      if (image.name === dstImageID) {
+        newImageInfo.push(srcObj); newImageInfo.push(image)
+      } else 
+        if (image.name !== srcImageID) newImageInfo.push(image) 
+
+    });
+    setImageInfo(newImageInfo)
+  }
+
+
+  // drop 
+  function handleOnDrop(dstImage) {
+    if ((dragSrcImageID === "") | (dstImage === "")) {
+      console.log("ERROR: tried to move (re-order) images but either src or dst is missing");
+    } else {
+      console.log("INFO: Moving image %s before image %s", dragSrcImageID, dstImage);
+      moveImage(dragSrcImageID, dstImage);
+    }
+    setStatus('noneSelected');
+    setDragSrcImageID('');
+  }
+
+  function handleOnDragEnd() {
+    if (status === "isDragging") {
+      console.log("Drag cancelled %s", dragSrcImageID);
+      setStatus('noneSelected');
+      setDragSrcImageID('');
+    }
+  }
+
   const divImages = imageInfo.map((image) => {
     let cl =
       "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800";
     cl =
       cl + " col-span-" + image.cols + " row-span-" + image.rows + " relative";
 
-    console.log("Image %s had cols: %s and rows: %s", image.name, image.cols, image.rows)
+    // console.log("Image %s had cols: %s and rows: %s", image.name, image.cols, image.rows)
 
     let imageCL = "bg-cover absolute top-0 ";
     if (status === "isDragging") imageCL += "blur-sm";
@@ -123,21 +166,18 @@ export function CssGrid2() {
               y: Y
             });
             setStatus('modalActiveOnImage')
-          } else {
-            // already modalActiveOnImage?
-            if (status === "modalActiveOnImage") {
-              setStatus("noneSelected")
-            }
           }
         }}
-        onDragEnter= {(e) => { console.log("Drag Enter %s", image.name) }}
-        onDragLeave= {(e) => { console.log("Drag Leave %s", image.name) }}
       >
         <img
           class={imageCL}
           src={getFilename(image.name)}
           alt={"photo of a " + image.name}
-        />
+          onDragStart= {(e) => { e.stopPropagation(); console.log("Drag Start %s", image.name); setDragSrcImageID(image.name) }}
+          onDragOver = {(e) => { e.stopPropagation(); e.preventDefault() }} // required
+          onDrop     = {(e) => { e.stopPropagation(); handleOnDrop(image.name) }}
+          onDragEnd  = {(e) => { e.stopPropagation(); handleOnDragEnd() }}
+          />
         <div class="absolute bottom-0 opacity-70 bg-slate-300 min-w-full">
           {image.comment}
         </div>
