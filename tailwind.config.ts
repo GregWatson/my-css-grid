@@ -9,26 +9,37 @@ const usedColors: string[]  = ['slate', 'gray', 'zinc', 'neutral', 'stone', 'red
 const safeColors = usedColors.map((color) => `bg-${color}-500` );
 
 /* Because of tailwind's lack of dynamic scripting, we need to
-  add all needed translate values to the safelist. *sigh*
+  add all needed translate values to the safelist. *sigh* 
+  cssGridMaxTranslateX is the max pixel width that we want the modal to
+  support when user right clicks in an image.
+  Nothing breaks if it is not big enough - the modal will simply
+  pop up to the left to the cursor instead of at the cursor.
 */
-const maxTranslate = 250;
+const cssGridMaxTranslateX = 250;
 
-var tempArray: any[] = [];
-for (let count = 0; count < maxTranslate; count++) {
-  tempArray = tempArray.concat(["translate-x-"+count, "translate-y-"+count])
+var transXArray: any[] = [];
+for (let count = 0; count < cssGridMaxTranslateX; count++) {
+  transXArray = transXArray.concat(["translate-x-"+count, "translate-y-"+count])
 }
 
 // Now extend the theme to deal with these.
 var trObj: any = {};
-for (let count = 13; count < maxTranslate; count++) {
+for (let count = 13; count < cssGridMaxTranslateX; count++) {
   var r = count/4.0;
   trObj[count.toString()] = r.toString() + 'rem'
 }
 
 const maxGridRows = 50;
 var gridRowsArray: any[] = [];
-for (let count = 0; count < maxGridRows; count++) {
-  gridRowsArray = gridRowsArray.concat(["grid-rows-[repeat(" + count + ",_300px)]"])
+for (let count = 1; count <= maxGridRows; count++) {
+  gridRowsArray = gridRowsArray.concat(["grid-rows-[repeat(" + count.toString() + ",300px)]"])
+}
+
+// Widescreen monitor = 4 cols.  Normal monitor = 3. Tablet = 2. Phone = 1
+const maxGridCols = 4;
+var gridColsArray: any[] = [];
+for (let count = 1; count <= maxGridCols; count++) {
+  gridColsArray = gridColsArray.concat(["grid-cols-[repeat(" + count.toString() + ",300px)]"])
 }
 
 console.log("tailwind.config.ts executed.");
@@ -43,23 +54,28 @@ module.exports = {
   safelist: [
     "col-span-2",
     "col-span-3",
+    "col-span-4",
     "col-span-6",
+    "col-span-10",
     "row-span-2",
     "row-span-3",
+    "row-span-4",
     ...safeColors,
-    ...tempArray,
+    ...transXArray,
     ...gridRowsArray,
-    "z-100"
+    ...gridColsArray,
+    "z-100",
+    "grid-cols-[repeat(1,30px)]",
+    "grid-cols-[repeat(3,30px)]",
+    "grid-cols-[repeat(6,30px)]",
+    "grid-cols-[repeat(10,30px)]",
+    "grid-rows-[repeat(2,30px)]",
+    "grid-rows-[repeat(4,30px)]",
+    "grid-rows-[repeat(7,30px)]",
+    "grid-rows-[repeat(11,30px)]"
   ],
   theme: {
     extend: {
-      gridTemplateColumns: {
-        // Simple 3 column grid
-        img3: "repeat(3, minmax(150px, 300px))",
-      },
-      gridTemplateRows: {
-        g5: "repeat(5, 300px)",
-      },
       translate: trObj
     },
   },

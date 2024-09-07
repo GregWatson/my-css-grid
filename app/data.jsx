@@ -12,6 +12,6 @@
     { name: 'woodpecker' , cols:'1', rows:'1', color:'fuchsia', comment:"Some comment about the image." }
   ];
 
-  export function getFilename (imageName) {
-    return process.env.PUBLIC_URL + "/images/" + imageName + ".jpg"}
+  export function getImageFileName (imageName) {
+    return "images/" + imageName + ".jpg" }
   
