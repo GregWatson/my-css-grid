@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { cssGridElement } from "./CssGridElement.jsx"
-import { computeNumRowsNeeded } from "./CssGridLib.jsx"
+import { computeNumRowsNeeded, moveElement } from "./CssGridLib.jsx"
 import { CssGridModal } from "./CssGridModal.jsx"
 
 // Maximum number of rows we allow for a grid element, regardless of
@@ -28,7 +28,7 @@ export function CssGrid({getImageFileName, gridContents, numCols}) {
 
   // Status info used by the modal (move, resize etc)
   const [rightClicked, setRightClicked] = useState({
-    imageID: "No Image",
+    elemID: "None",
     x: 0,
     y: 0,
     cols: 0,
@@ -39,19 +39,19 @@ export function CssGrid({getImageFileName, gridContents, numCols}) {
   const [dragSrcElemID, setdragSrcElemID ] = useState("");
   const [dragDstElemID, setdragDstElemID ] = useState("");
 
-  // const statusVals = ['noneSelected', 'modalActiveOnImage', 'resizeImage', 'isDragging', 'moveElement'];
+  // const statusVals = ['noneSelected', 'modalActive', 'resizeElement', 'isDragging', 'moveElement'];
   const [status, setStatus] = useState('noneSelected');
 
   // Event handling. Events cause status to be set, so we process them here.
-  if (status === "resizeImage") {
-    console.log("RESIZE IMAGE: image %s  cols:%d  rows:%d", rightClicked.imageID, rightClicked.cols, rightClicked.rows);
-    let newGridInfo = gridInfo.map((image) => {
-      if (image.name === rightClicked.imageID) 
-        return {...image,
+  if (status === "resizeElement") {
+    console.log("RESIZE IMAGE: image %s  cols:%d  rows:%d", rightClicked.elemID, rightClicked.cols, rightClicked.rows);
+    let newGridInfo = gridInfo.map((element) => {
+      if (element.name === rightClicked.elemID) 
+        return {...element,
           cols:rightClicked.cols,
           rows:rightClicked.rows
         }
-      else return image
+      else return element
     })
     setGridInfo(newGridInfo)
     setStatus('noneSelected')
@@ -64,14 +64,13 @@ export function CssGrid({getImageFileName, gridContents, numCols}) {
     setdragSrcElemID('');
   }
 
-
   let numRows = computeNumRowsNeeded(gridInfo, numCols);
   let gridClass =
     "grid grid-cols-[repeat(" + numCols.toString() + "," + gridImageSize + "px)] grid-rows-[repeat(" + numRows.toString() + "," + gridImageSize + "px)] gap-1";
 
-  const gridElements = gridInfo.map(image => 
+  const gridElements = gridInfo.map(element => 
     cssGridElement(
-      image, 
+      element, 
       getImageFileName,
       status, 
       setStatus,
@@ -85,15 +84,16 @@ export function CssGrid({getImageFileName, gridContents, numCols}) {
   return (
     <div className={gridClass}>
       { gridElements }
-      { status === "modalActiveOnImage" &&
+      { status === "modalActive" &&
         createPortal(
-          <CssGridModal onClose={() => (status === "modalActiveOnImage") ? setStatus('noneSelected') : {} } 
+          <CssGridModal 
             rightClicked={rightClicked}
             setRightClicked={setRightClicked}
             setStatus={setStatus}
             numCols={numCols}
-          />,
-          document.getElementById(rightClicked.imageID)
+            onClose={() => (status === "modalActive") ? setStatus('noneSelected') : {} } 
+            />,
+          document.getElementById(rightClicked.elemID)
       )}
     </div>
   );

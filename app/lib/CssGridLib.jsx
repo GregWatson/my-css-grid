@@ -36,19 +36,19 @@ export function computeNumRowsNeeded(gridContents, numCols) {
 /* move srcImage to immediately before dstImage in the list of 
    grid Elements. Return the new list.
  */
-export function moveElement(srcImageID, dstImageID, gridInfo) {
+export function moveElement(srcElemID, dstElemID, gridInfo) {
     // get the src image object
     let srcObj;
     gridInfo.forEach((image) => {
-      if (image.name === srcImageID) srcObj = image;
+      if (image.name === srcElemID) srcObj = image;
     });
     // create new list
     let newGridInfo = [];
     gridInfo.forEach((image) => {
-      if (image.name === dstImageID) {
+      if (image.name === dstElemID) {
         newGridInfo.push(srcObj); newGridInfo.push(image)
       } else 
-        if (image.name !== srcImageID) newGridInfo.push(image) 
+        if (image.name !== srcElemID) newGridInfo.push(image) 
     });
     return(newGridInfo)
 }

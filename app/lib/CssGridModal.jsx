@@ -2,12 +2,13 @@
 
 import { CssGridImageSizeSelect } from "./CssGridImageSizeSelect.jsx"
 
-export function CssGridModal(rightClicked, setRightClicked, setStatus, numCols) {
+export function CssGridModal({rightClicked, setRightClicked, setStatus, numCols}) {
     let cl =
       "z-20 max-w-min min-w-min p-1 space-y-1 bg-sky-200 relative translate-x-" +
       rightClicked.x +
       " translate-y-" +
       rightClicked.y;
+
     return (
       <div className={cl}>
         <button
@@ -21,7 +22,10 @@ export function CssGridModal(rightClicked, setRightClicked, setStatus, numCols) 
         </button>
 
         <CssGridImageSizeSelect
-          
+            rightClicked={rightClicked}
+            setRightClicked={setRightClicked}
+            setStatus={setStatus}
+            numCols={numCols} 
         />
       </div>
     );

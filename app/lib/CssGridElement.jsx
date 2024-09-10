@@ -5,9 +5,9 @@ import { maxTranslate } from "@/tailwind.config";
 // drop (from Drag and Drop)
 function handleOnDrop(dstElemID, setdragDstElemID, dragSrcElemID, setStatus) {
   if ((dragSrcElemID === "") | (dstElemID === "")) {
-    console.log("ERROR: tried to move (re-order) images but either src or dst is missing");
+    console.log("ERROR: tried to move (re-order) elements but either src or dst is missing");
   } else {
-    console.log("INFO: Moving image %s before image %s", dragSrcElemID, dstElemID);
+    console.log("INFO: Moving element %s before element %s", dragSrcElemID, dstElemID);
   }
   setdragDstElemID(dstElemID);
   setStatus('moveElement');
@@ -21,27 +21,27 @@ function handleOnDragEnd(status, setStatus, dragSrcElemID, setdragSrcElemID) {
   }
 }
 
-export function cssGridElement( image, getImageFileName, status, setStatus, 
+export function cssGridElement( element, getImageFileName, status, setStatus, 
                                 dragSrcElemID, setdragSrcElemID,
                                 setdragDstElemID, 
                                 rightClicked, setRightClicked ) {
   let cl =
     "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800";
   cl =
-    cl + " col-span-" + image.cols + " row-span-" + image.rows + " relative";
+    cl + " col-span-" + element.cols + " row-span-" + element.rows + " relative";
 
-  // console.log("Image %s had cols: %s and rows: %s", image.name, image.cols, image.rows)
+  // console.log("element %s had cols: %s and rows: %s", element.name, element.cols, element.rows)
 
-  let imageCL = "bg-cover absolute top-0 ";
-  if (status === "isDragging") imageCL += "blur-sm";
+  let elementCL = "bg-cover absolute top-0 ";
+  if (status === "isDragging") elementCL += "blur-sm";
 
   return (
     <div
-      id={image.name}
-      key={image.name}
+      id={element.name}
+      key={element.name}
       className={cl}
       onClick = {() => {
-        if ((status === 'modalActiveOnImage') | (status === "isDragging")) {
+        if ((status === 'modalActive') | (status === "isDragging")) {
           setStatus("noneSelected")
         }}
       }
@@ -55,25 +55,25 @@ export function cssGridElement( image, getImageFileName, status, setStatus,
         if (status === "noneSelected") {
           setRightClicked({
             ...rightClicked,
-            imageID: image.name,
+            elemID: element.name,
             x: X,
             y: Y
           });
-          setStatus('modalActiveOnImage')
+          setStatus('modalActive')
         }
       }}
     >
       <img
-        className={imageCL}
-        src={getImageFileName(image.name)}
-        alt={"photo of a " + image.name}
-        onDragStart= {(e) => { e.stopPropagation(); console.log("Drag Start %s", image.name); setdragSrcElemID(image.name) }}
+        className={elementCL}
+        src={getImageFileName(element.name)}
+        alt={"photo of a " + element.name}
+        onDragStart= {(e) => { e.stopPropagation(); console.log("Drag Start %s", element.name); setdragSrcElemID(element.name) }}
         onDragOver = {(e) => { e.stopPropagation(); e.preventDefault() }} // required
-        onDrop     = {(e) => { e.stopPropagation(); handleOnDrop(image.name, setdragDstElemID, dragSrcElemID, setStatus) }}
+        onDrop     = {(e) => { e.stopPropagation(); handleOnDrop(element.name, setdragDstElemID, dragSrcElemID, setStatus) }}
         onDragEnd  = {(e) => { e.stopPropagation(); handleOnDragEnd(status, setStatus, dragSrcElemID, setdragSrcElemID) }}
         />
       <div className="absolute bottom-0 opacity-70 bg-slate-300 min-w-full">
-        {image.comment}
+        {element.comment}
       </div>
     </div>
   );

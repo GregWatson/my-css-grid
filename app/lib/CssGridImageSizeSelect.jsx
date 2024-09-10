@@ -33,13 +33,11 @@ export function CssGridImageSizeSelect({
   const totRows = sFib(maxCssGridElemRows)
   let sizes = getSizeArray(numCols)
 
-  console.log("GridImageSizeSelect numCols is %d   totCols is %d   Sizes has len %d", numCols, totCols, sizes.length);
-
   const divSizes = sizes.map((size, index) => {
     index=index+1;
     let nCols = size[0];
     let nRows = size[1];
-    let imageID = rightClicked.imageID;
+    let elemID = rightClicked.elemID;
     let cl =
       "rounded-lg border-2 border-slate-400 bg-sky-500 hover:border-4 hover:border-slate-800";
     cl = cl + " col-span-" + nCols + " row-span-" + nRows + " relative";
@@ -49,10 +47,10 @@ export function CssGridImageSizeSelect({
         className={cl}
         onClick={(e) => {
           e.stopPropagation();
-          console.log("Resize: Image '%s' to %d cols by %d rows.", imageID, nCols, nRows );
+          console.log("Resize: Image '%s' to %d cols by %d rows.", elemID, nCols, nRows );
           setRightClicked({...rightClicked, cols:nCols.toString(), rows:nRows.toString()});
           if (nCols === totCols) setStatus('noneSelected')
-          else setStatus('resizeImage')
+          else setStatus('resizeElement')
         }}
       />
     );
