@@ -69,10 +69,10 @@ module.exports = {
     "grid-cols-[repeat(3,30px)]",
     "grid-cols-[repeat(6,30px)]",
     "grid-cols-[repeat(10,30px)]",
-    "grid-rows-[repeat(2,30px)]",
+    "grid-rows-[repeat(1,30px)]",
+    "grid-rows-[repeat(3,30px)]",
     "grid-rows-[repeat(4,30px)]",
-    "grid-rows-[repeat(7,30px)]",
-    "grid-rows-[repeat(11,30px)]"
+    "grid-rows-[repeat(10,30px)]"
   ],
   theme: {
     extend: {

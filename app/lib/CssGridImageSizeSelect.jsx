@@ -1,5 +1,7 @@
 "use client";
 
+import { maxCssGridElemRows } from "./CssGrid.jsx"
+
 function sFib(num)
 {
     var rval=1;
@@ -12,9 +14,8 @@ function sFib(num)
 
 
 function getSizeArray(numCols) {
-  let totCols = sFib(numCols)
-  let sizes = [ [totCols, 1] ]; // Text line
-  for (let rowIndex = 1; rowIndex <= numCols; rowIndex++) {
+  let sizes = [ ]; // Text line
+  for (let rowIndex = 1; rowIndex <= maxCssGridElemRows; rowIndex++) {
     for (let colIndex = 1; colIndex <= numCols; colIndex++) {
       sizes = sizes.concat([[colIndex, rowIndex]])
     }
@@ -29,7 +30,7 @@ export function CssGridImageSizeSelect({
   numCols
 }) {
   const totCols = sFib(numCols)
-  const totRows = totCols + 1
+  const totRows = sFib(maxCssGridElemRows)
   let sizes = getSizeArray(numCols)
 
   console.log("GridImageSizeSelect numCols is %d   totCols is %d   Sizes has len %d", numCols, totCols, sizes.length);
@@ -41,9 +42,6 @@ export function CssGridImageSizeSelect({
     let imageID = rightClicked.imageID;
     let cl =
       "rounded-lg border-2 border-slate-400 bg-sky-500 hover:border-4 hover:border-slate-800";
-    if (nCols === totCols) {
-      cl = "bg-sky-200 text-center";
-    }
     cl = cl + " col-span-" + nCols + " row-span-" + nRows + " relative";
     return (
       <div
@@ -56,27 +54,30 @@ export function CssGridImageSizeSelect({
           if (nCols === totCols) setStatus('noneSelected')
           else setStatus('resizeImage')
         }}
-      >
-        {nCols === totCols ? "Resize Image" : null}
-      </div>
+      />
     );
   });
 
   let gridClass =
-    "p-1 border-2 border-sky-800 grid rounded " +
+    "grid rounded " +
     "grid-cols-[repeat(" + totCols.toString() + ",30px)] " +
     "grid-rows-[repeat(" + totRows.toString() + ",30px)] " +
-    "gap-1 z-30 max-w-min";
+    "gap-1 z-30  max-w-min";
 
   return (
-    <div
-      className={gridClass}
-      onClick={(e) => {
-        e.stopPropagation();
-        console.log("ImageSizeSelect Grid is processing the click event.");
-        setStatus("noneSelected")
-    }}>
-      {divSizes}
+    <div className="rounded-lg max-w-min border-sky-800 ">
+      <div className=" rounded-lg bg-sky-200 text-center  z-30 min-w-full max-w-min">
+        Resize Image
+      </div>
+      <div
+        className={gridClass}
+        onClick={(e) => {
+          e.stopPropagation();
+          console.log("ImageSizeSelect Grid is processing the click event.");
+          setStatus("noneSelected")
+      }}>
+        {divSizes}
+      </div>
     </div>
   );
 }
