@@ -1,30 +1,12 @@
 "use client";
 
-import { maxTranslate } from "@/tailwind.config";
+import { cssGridMaxTranslateX } from "@/tailwind.config";
+import { CssGridModalInfo, handleOnDragEnd, handleOnDrop } from "./CssGridLib.tsx"
 
-// drop (from Drag and Drop)
-function handleOnDrop(dstElemID, setdragDstElemID, dragSrcElemID, setStatus) {
-  if ((dragSrcElemID === "") | (dstElemID === "")) {
-    console.log("ERROR: tried to move (re-order) elements but either src or dst is missing");
-  } else {
-    console.log("INFO: Moving element %s before element %s", dragSrcElemID, dstElemID);
-  }
-  setdragDstElemID(dstElemID);
-  setStatus('moveElement');
-}
-
-function handleOnDragEnd(status, setStatus, dragSrcElemID, setdragSrcElemID) {
-  if (status === "isDragging") {
-    console.log("Drag cancelled %s", dragSrcElemID);
-    setStatus('noneSelected');
-    setdragSrcElemID('');
-  }
-}
-
-export function cssGridElement( element, getImageFileName, status, setStatus, 
-                                dragSrcElemID, setdragSrcElemID,
-                                setdragDstElemID, 
-                                rightClicked, setRightClicked ) {
+export function cssGridElement( element:any, getImageFileName:any, status:any, setStatus:any, 
+                                  dragSrcElemID:any, setdragSrcElemID:any,
+                                  setdragDstElemID:any, 
+                                  rightClicked:CssGridModalInfo, setRightClicked:any ) {
   let cl =
     "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800";
   cl =
@@ -41,7 +23,7 @@ export function cssGridElement( element, getImageFileName, status, setStatus,
       key={element.name}
       className={cl}
       onClick = {() => {
-        if ((status === 'modalActive') | (status === "isDragging")) {
+        if ((status === 'modalActive') || (status === "isDragging")) {
           setStatus("noneSelected")
         }}
       }
@@ -50,8 +32,8 @@ export function cssGridElement( element, getImageFileName, status, setStatus,
         // Bring up modal at location of mouse click.
         let X = Math.round((e.pageX - e.currentTarget.offsetLeft) / 4);
         let Y = Math.round((e.pageY - e.currentTarget.offsetTop) / 4);
-        if (X > maxTranslate) { X = maxTranslate-1}
-        if (Y > maxTranslate) { Y = maxTranslate-1}
+        if (X > cssGridMaxTranslateX) { X = cssGridMaxTranslateX-1}
+        if (Y > cssGridMaxTranslateX) { Y = cssGridMaxTranslateX-1}
         if (status === "noneSelected") {
           setRightClicked({
             ...rightClicked,

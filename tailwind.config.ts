@@ -1,4 +1,5 @@
-/** @type {import('tailwindcss').Config} */
+/* @type {import('tailwindcss').Config} */
+import type { Config } from 'tailwindcss';
 
 /* Define any tailwind symbols that may be dynamically generated using JS code */
 const usedColors: string[]  = ['slate', 'gray', 'zinc', 'neutral', 'stone', 'red',
@@ -15,7 +16,7 @@ const safeColors = usedColors.map((color) => `bg-${color}-500` );
   Nothing breaks if it is not big enough - the modal will simply
   pop up to the left to the cursor instead of at the cursor.
 */
-const cssGridMaxTranslateX = 250;
+export const cssGridMaxTranslateX = 250;
 
 var transXArray: any[] = [];
 for (let count = 0; count < cssGridMaxTranslateX; count++) {
@@ -44,7 +45,7 @@ for (let count = 1; count <= maxGridCols; count++) {
 
 console.log("tailwind.config.ts executed.");
 
-module.exports = {
+const config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -82,4 +83,6 @@ module.exports = {
 
   /*  plugins: [‘react-css-modules’] */
   plugins: [require("tailwindcss-animate")],
-};
+}satisfies Config;
+
+export default config;

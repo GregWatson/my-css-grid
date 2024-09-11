@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { cssGridElement } from "./CssGridElement.jsx"
-import { computeNumRowsNeeded, moveElement } from "./CssGridLib.jsx"
-import { CssGridModal } from "./CssGridModal.jsx"
+import { cssGridElement } from "./CssGridElement.tsx"
+import { CssGridModalInfo, computeNumRowsNeeded, moveElement } from "./CssGridLib.tsx"
+import { CssGridModal } from "./CssGridModal.tsx"
 
 // Maximum number of rows we allow for a grid element, regardless of
 // max number of colums set (numCols).
@@ -14,11 +14,13 @@ export const maxCssGridElemRows = 4;
    Use 4 for a wide display and 1 for a narrow display (e.g. phone)?
    Values 1-4 are supported.
 */
-export function CssGrid({getImageFileName, gridContents, numCols}) {
+export function CssGrid({getImageFileName, gridContents, numCols}:
+  {getImageFileName:any, gridContents:any, numCols:any}
+) {
   const gridImageSize = "300"; // px. Need to update in tailwind.config.ts as well.
   /* Create a local copy in which we bound the size of any element to
    the max number of rows and columns selected for the current window size. */
-  let localGridInfo = gridContents.map((info) => {
+  let localGridInfo = gridContents.map((info:any) => {
     return {...info,
       cols: info.cols > numCols ? numCols : info.cols,
       rows: (info.cols > numCols) && (info.rows > numCols) ? numCols : info.rows
@@ -27,7 +29,7 @@ export function CssGrid({getImageFileName, gridContents, numCols}) {
   const [gridInfo, setGridInfo] = useState(localGridInfo);
 
   // Status info used by the modal (move, resize etc)
-  const [rightClicked, setRightClicked] = useState({
+  const [rightClicked, setRightClicked] = useState<CssGridModalInfo>({
     elemID: "None",
     x: 0,
     y: 0,

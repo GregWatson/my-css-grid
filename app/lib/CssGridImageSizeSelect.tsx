@@ -1,8 +1,9 @@
 "use client";
 
-import { maxCssGridElemRows } from "./CssGrid.jsx"
+import { maxCssGridElemRows } from "./CssGrid.tsx"
+import { CssGridModalInfo } from "./CssGridLib.tsx"
 
-function sFib(num)
+function sFib(num:number)
 {
     var rval=1;
     if (num < 2) 
@@ -13,8 +14,8 @@ function sFib(num)
 }
 
 
-function getSizeArray(numCols) {
-  let sizes = [ ]; // Text line
+function getSizeArray(numCols:number) {
+  let sizes:any[] = [ ]; // Text line
   for (let rowIndex = 1; rowIndex <= maxCssGridElemRows; rowIndex++) {
     for (let colIndex = 1; colIndex <= numCols; colIndex++) {
       sizes = sizes.concat([[colIndex, rowIndex]])
@@ -23,12 +24,9 @@ function getSizeArray(numCols) {
   return sizes
 }
 
-export function CssGridImageSizeSelect({
-  rightClicked,
-  setRightClicked,
-  setStatus,
-  numCols
-}) {
+export function CssGridImageSizeSelect({rightClicked,  setRightClicked,  setStatus,  numCols}:
+  {rightClicked:CssGridModalInfo,  setRightClicked:any,  setStatus:any,  numCols:number}
+) {
   const totCols = sFib(numCols)
   const totRows = sFib(maxCssGridElemRows)
   let sizes = getSizeArray(numCols)
