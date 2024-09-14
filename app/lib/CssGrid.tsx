@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { cssGridElement } from "./CssGridElement.tsx"
-import { CssGridModalInfo, computeNumRowsNeeded, moveElement } from "./CssGridLib.tsx"
+import { CssGridElInfo, CssGridStatus, CssGridModalInfo, computeNumRowsNeeded, moveElement } from "./CssGridLib.tsx"
 import { CssGridModal } from "./CssGridModal.tsx"
 
 // Maximum number of rows we allow for a grid element, regardless of
@@ -17,13 +17,14 @@ export const maxCssGridElemRows = 4;
 export function CssGrid({getImageFileName, gridContents, numCols}:
   {getImageFileName:any, gridContents:any, numCols:any}
 ) {
-  const gridImageSize = "300"; // px. Need to update in tailwind.config.ts as well.
   /* Create a local copy in which we bound the size of any element to
    the max number of rows and columns selected for the current window size. */
   let localGridInfo = gridContents.map((info:any) => {
-    return {...info,
-      cols: info.cols > numCols ? numCols : info.cols,
-      rows: (info.cols > numCols) && (info.rows > numCols) ? numCols : info.rows
+    return {
+      ID: info.name,
+      cols: +info.cols > numCols ? numCols : +info.cols,
+      rows: (+info.cols > numCols) && (+info.rows > numCols) ? numCols : +info.rows,
+      comment: info.comment
     }
   })
   const [gridInfo, setGridInfo] = useState(localGridInfo);
@@ -38,17 +39,16 @@ export function CssGrid({getImageFileName, gridContents, numCols}:
   });
 
   // Info used when reOrdering images via DnD
-  const [dragSrcElemID, setdragSrcElemID ] = useState("");
-  const [dragDstElemID, setdragDstElemID ] = useState("");
+  const [dragSrcElemID, setdragSrcElemID ] = useState<string>("");
+  const [dragDstElemID, setdragDstElemID ] = useState<string>("");
 
-  // const statusVals = ['noneSelected', 'modalActive', 'resizeElement', 'isDragging', 'moveElement'];
-  const [status, setStatus] = useState('noneSelected');
+  const [status, setStatus] = useState<CssGridStatus>('noneSelected');
 
   // Event handling. Events cause status to be set, so we process them here.
   if (status === "resizeElement") {
     console.log("RESIZE IMAGE: image %s  cols:%d  rows:%d", rightClicked.elemID, rightClicked.cols, rightClicked.rows);
-    let newGridInfo = gridInfo.map((element) => {
-      if (element.name === rightClicked.elemID) 
+    let newGridInfo = gridInfo.map((element:CssGridElInfo) => {
+      if (element.ID === rightClicked.elemID) 
         return {...element,
           cols:rightClicked.cols,
           rows:rightClicked.rows
@@ -68,9 +68,9 @@ export function CssGrid({getImageFileName, gridContents, numCols}:
 
   let numRows = computeNumRowsNeeded(gridInfo, numCols);
   let gridClass =
-    "grid grid-cols-[repeat(" + numCols.toString() + "," + gridImageSize + "px)] grid-rows-[repeat(" + numRows.toString() + "," + gridImageSize + "px)] gap-1";
+    "grid grid-cols-[repeat(" + numCols.toString() + ",minmax(100px,1fr))] grid-rows-[repeat(" + numRows.toString() + ",minmax(300px,1fr))] gap-1";
 
-  const gridElements = gridInfo.map(element => 
+  const gridElements = gridInfo.map((element:CssGridElInfo) => 
     cssGridElement(
       element, 
       getImageFileName,
@@ -93,7 +93,7 @@ export function CssGrid({getImageFileName, gridContents, numCols}:
             setRightClicked={setRightClicked}
             setStatus={setStatus}
             numCols={numCols}
-            onClose={() => (status === "modalActive") ? setStatus('noneSelected') : {} } 
+            onModalClose={() => (status === "modalActive") ? setStatus('noneSelected') : {} } 
             />,
           document.getElementById(rightClicked.elemID)
       )}

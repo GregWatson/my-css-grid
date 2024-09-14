@@ -1,26 +1,26 @@
 "use client";
 
 import { cssGridMaxTranslateX } from "@/tailwind.config";
-import { CssGridModalInfo, handleOnDragEnd, handleOnDrop } from "./CssGridLib.tsx"
+import { CssGridElInfo, CssGridStatus, CssGridModalInfo, handleOnDragEnd, handleOnDrop } from "./CssGridLib.tsx"
 
-export function cssGridElement( element:any, getImageFileName:any, status:any, setStatus:any, 
-                                  dragSrcElemID:any, setdragSrcElemID:any,
-                                  setdragDstElemID:any, 
-                                  rightClicked:CssGridModalInfo, setRightClicked:any ) {
+export function cssGridElement( element:CssGridElInfo, getImageFileName:any, status:CssGridStatus, setStatus:any, 
+                                dragSrcElemID:any, setdragSrcElemID:any,
+                                setdragDstElemID:any, 
+                                rightClicked:CssGridModalInfo, setRightClicked:any ) {
   let cl =
     "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800";
   cl =
-    cl + " col-span-" + element.cols + " row-span-" + element.rows + " relative";
+    cl + " col-span-" + element.cols.toString() + " row-span-" + element.rows.toString() + " relative";
 
-  // console.log("element %s had cols: %s and rows: %s", element.name, element.cols, element.rows)
+  // console.log("element %s had cols: %s and rows: %s", element.ID, element.cols, element.rows)
 
   let elementCL = "bg-cover absolute top-0 ";
   if (status === "isDragging") elementCL += "blur-sm";
 
   return (
     <div
-      id={element.name}
-      key={element.name}
+      id={element.ID}
+      key={element.ID}
       className={cl}
       onClick = {() => {
         if ((status === 'modalActive') || (status === "isDragging")) {
@@ -37,7 +37,7 @@ export function cssGridElement( element:any, getImageFileName:any, status:any, s
         if (status === "noneSelected") {
           setRightClicked({
             ...rightClicked,
-            elemID: element.name,
+            elemID: element.ID,
             x: X,
             y: Y
           });
@@ -47,11 +47,11 @@ export function cssGridElement( element:any, getImageFileName:any, status:any, s
     >
       <img
         className={elementCL}
-        src={getImageFileName(element.name)}
-        alt={"photo of a " + element.name}
-        onDragStart= {(e) => { e.stopPropagation(); console.log("Drag Start %s", element.name); setdragSrcElemID(element.name) }}
+        src={getImageFileName(element.ID)}
+        alt={"photo of a " + element.ID}
+        onDragStart= {(e) => { e.stopPropagation(); console.log("Drag Start %s", element.ID); setdragSrcElemID(element.ID) }}
         onDragOver = {(e) => { e.stopPropagation(); e.preventDefault() }} // required
-        onDrop     = {(e) => { e.stopPropagation(); handleOnDrop(element.name, setdragDstElemID, dragSrcElemID, setStatus) }}
+        onDrop     = {(e) => { e.stopPropagation(); handleOnDrop(element.ID, setdragDstElemID, dragSrcElemID, setStatus) }}
         onDragEnd  = {(e) => { e.stopPropagation(); handleOnDragEnd(status, setStatus, dragSrcElemID, setdragSrcElemID) }}
         />
       <div className="absolute bottom-0 opacity-70 bg-slate-300 min-w-full">

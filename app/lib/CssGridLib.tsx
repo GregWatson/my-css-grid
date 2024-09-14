@@ -2,13 +2,24 @@
 
 // Misc Types and Functions used by CssGrid 
 
+// Grids are ordered lists of Elements:
+export type CssGridElInfo = 
+{ ID: string,  // Must be unique within this Grid
+  cols: number,
+  rows: number,
+  comment: string
+}
+
+// Info used by pop-up modal to modify size, order, etc.
 export type CssGridModalInfo = {
-    elemID: String,
-    x: Number,
-    y: Number,
-    cols: Number,
-    rows: Number
+    elemID: string,
+    x: number,
+    y: number,
+    cols: number,
+    rows: number
   };
+
+export type CssGridStatus = 'noneSelected' | 'modalActive' | 'resizeElement' | 'isDragging' | 'moveElement'
 
 /* Compute the number of rows needed to display the images
    assuming no back-filling for smaller images. Might need fewer
@@ -19,9 +30,9 @@ export function computeNumRowsNeeded(gridContents:any, numCols:number) {
   let numRowsUsed = 1; // In this row
   let colsLeft = numCols;
 
-  gridContents.forEach((element) => {
-    let i_rows = +element.rows;
-    let i_cols = +element.cols;
+  gridContents.forEach((element:CssGridElInfo) => {
+    let i_rows = element.rows;
+    let i_cols = element.cols;
     if (i_cols > colsLeft) { // cannot add to current row.
       numRows = numRows + numRowsUsed;
       colsLeft = numCols - i_cols;
@@ -44,26 +55,26 @@ export function computeNumRowsNeeded(gridContents:any, numCols:number) {
 /* move srcImage to immediately before dstImage in the list of 
    grid Elements. Return the new list.
  */
-export function moveElement(srcElemID, dstElemID, gridInfo) {
+export function moveElement(srcElemID:string, dstElemID:string, gridInfo:CssGridElInfo[]) :CssGridElInfo[] {
     // get the src image object
-    let srcObj;
-    gridInfo.forEach((image) => {
-      if (image.name === srcElemID) srcObj = image;
+    let srcObj:CssGridElInfo;
+    gridInfo.forEach((element:CssGridElInfo) => {
+      if (element.ID === srcElemID) srcObj = element;
     });
     // create new list
-    let newGridInfo = [];
-    gridInfo.forEach((image) => {
-      if (image.name === dstElemID) {
-        newGridInfo.push(srcObj); newGridInfo.push(image)
+    let newGridInfo :CssGridElInfo[] = [];
+    gridInfo.forEach((element:CssGridElInfo) => {
+      if (element.ID === dstElemID) {
+        newGridInfo.push(srcObj); newGridInfo.push(element)
       } else 
-        if (image.name !== srcElemID) newGridInfo.push(image) 
+        if (element.ID !== srcElemID) newGridInfo.push(element) 
     });
-    return(newGridInfo)
+    return newGridInfo
 }
 
 // drop (from Drag and Drop)
-export function handleOnDrop(dstElemID, setdragDstElemID, dragSrcElemID, setStatus) {
-  if ((dragSrcElemID === "") | (dstElemID === "")) {
+export function handleOnDrop(dstElemID:string, setdragDstElemID:any, dragSrcElemID:any, setStatus:any) {
+  if ((dragSrcElemID === "") || (dstElemID === "")) {
     console.log("ERROR: tried to move (re-order) elements but either src or dst is missing");
   } else {
     console.log("INFO: Moving element %s before element %s", dragSrcElemID, dstElemID);
@@ -72,7 +83,7 @@ export function handleOnDrop(dstElemID, setdragDstElemID, dragSrcElemID, setStat
   setStatus('moveElement');
 }
 
-export function handleOnDragEnd(status, setStatus, dragSrcElemID, setdragSrcElemID) {
+export function handleOnDragEnd(status:CssGridStatus, setStatus:any, dragSrcElemID:string, setdragSrcElemID:any) {
   if (status === "isDragging") {
     console.log("Drag cancelled %s", dragSrcElemID);
     setStatus('noneSelected');

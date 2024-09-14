@@ -3,8 +3,8 @@
 import { CssGridImageSizeSelect } from "./CssGridImageSizeSelect.tsx"
 import { CssGridModalInfo } from "./CssGridLib.tsx"
 
-export function CssGridModal({rightClicked, setRightClicked, setStatus, numCols}:
-  {rightClicked:CssGridModalInfo, setRightClicked:any, setStatus:any, numCols:number}
+export function CssGridModal({rightClicked, setRightClicked, setStatus, numCols, onModalClose}:
+  {rightClicked:CssGridModalInfo, setRightClicked:any, setStatus:any, numCols:number, onModalClose:any}
 ) {
     let cl =
       "z-20 max-w-min min-w-min p-1 space-y-1 bg-sky-200 relative translate-x-" +
@@ -13,7 +13,7 @@ export function CssGridModal({rightClicked, setRightClicked, setStatus, numCols}
       rightClicked.y;
 
     return (
-      <div className={cl}>
+      <div className={cl} onClick={onModalClose}>
         <button
           className="min-w-full p-1 rounded bg-sky-500 text-center  border-2 border-sky-800 hover:border-slate-800 "
           onClick={(e) => {

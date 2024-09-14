@@ -33,14 +33,14 @@ for (let count = 13; count < cssGridMaxTranslateX; count++) {
 const maxGridRows = 50;
 var gridRowsArray: any[] = [];
 for (let count = 1; count <= maxGridRows; count++) {
-  gridRowsArray = gridRowsArray.concat(["grid-rows-[repeat(" + count.toString() + ",300px)]"])
+  gridRowsArray = gridRowsArray.concat(["grid-rows-[repeat(" + count.toString() + ",minmax(300px,1fr))]"])
 }
 
 // Widescreen monitor = 4 cols.  Normal monitor = 3. Tablet = 2. Phone = 1
 const maxGridCols = 4;
 var gridColsArray: any[] = [];
 for (let count = 1; count <= maxGridCols; count++) {
-  gridColsArray = gridColsArray.concat(["grid-cols-[repeat(" + count.toString() + ",300px)]"])
+  gridColsArray = gridColsArray.concat(["grid-cols-[repeat(" + count.toString() + ",minmax(100px,1fr))]"])
 }
 
 console.log("tailwind.config.ts executed.");
