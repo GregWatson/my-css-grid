@@ -2,7 +2,12 @@
 
 import { cssGridMaxTranslateX } from "@/tailwind.config";
 import { handleOnDragEnd, handleOnDrop } from "./cssgrid-lib.ts";
-import { CssGridElInfo, CssGridStatus, CssGridModalInfo } from "./cssgrid-types.ts"
+import {
+  CssGridElInfo,
+  CssGridStatus,
+  CssGridModalInfo,
+} from "./cssgrid-types.ts";
+import { cssGridModalHeightPx } from "./cssgrid-modal.tsx";
 
 export function CssGridElement({
   element,
@@ -13,7 +18,10 @@ export function CssGridElement({
   setdragSrcElemID,
   setdragDstElemID,
   rightClicked,
-  setRightClicked
+  setRightClicked,
+  windowWidth,
+  windowHeight,
+  cssGridModalWidthPx,
 }: {
   element: CssGridElInfo;
   getImageFileName: any;
@@ -24,6 +32,9 @@ export function CssGridElement({
   setdragDstElemID: any;
   rightClicked: CssGridModalInfo;
   setRightClicked: any;
+  windowWidth: number;
+  windowHeight: number;
+  cssGridModalWidthPx: number;
 }) {
   let cl =
     "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800";
@@ -34,8 +45,6 @@ export function CssGridElement({
     " row-span-" +
     element.rows.toString() +
     " relative";
-
-  // console.log("element %s had cols: %s and rows: %s", element.ID, element.cols, element.rows)
 
   let elementCL = "bg-cover absolute top-0 ";
   if (status === "isDragging") elementCL += "blur-sm";
@@ -54,8 +63,17 @@ export function CssGridElement({
         // User right clicks.
         e.preventDefault(); // prevent the default behaviour when right clicked.
         // Bring up modal at location of mouse click.
-        let X = Math.round((e.pageX - e.currentTarget.offsetLeft) / 4);
-        let Y = Math.round((e.pageY - e.currentTarget.offsetTop) / 4);
+        // If too far right (offscreen) then move it left.
+        let X = Math.round(e.clientX);
+        if (X + cssGridModalWidthPx > windowWidth) {
+          X = windowWidth - cssGridModalWidthPx;
+        }
+        X = X >> 2; // convert to quad pix unit
+        let Y = Math.round(e.clientY);
+        if (Y + cssGridModalHeightPx > windowHeight) {
+          Y = windowHeight - cssGridModalHeightPx;
+        }
+        Y = Y >> 2; // convert to quad pix unit
         if (X > cssGridMaxTranslateX) {
           X = cssGridMaxTranslateX - 1;
         }

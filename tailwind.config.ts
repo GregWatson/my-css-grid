@@ -1,13 +1,33 @@
 /* @type {import('tailwindcss').Config} */
-import type { Config } from 'tailwindcss';
+import type { Config } from "tailwindcss";
 
 /* Define any tailwind symbols that may be dynamically generated using JS code */
-const usedColors: string[]  = ['slate', 'gray', 'zinc', 'neutral', 'stone', 'red',
-    'orange', 'amber', 'yellow', 'lime', 'green', 'emerald',
-    'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet',
-    'purple', 'fuchsia', 'pink', 'rose' ];
+const usedColors: string[] = [
+  "slate",
+  "gray",
+  "zinc",
+  "neutral",
+  "stone",
+  "red",
+  "orange",
+  "amber",
+  "yellow",
+  "lime",
+  "green",
+  "emerald",
+  "teal",
+  "cyan",
+  "sky",
+  "blue",
+  "indigo",
+  "violet",
+  "purple",
+  "fuchsia",
+  "pink",
+  "rose",
+];
 
-const safeColors = usedColors.map((color) => `bg-${color}-500` );
+const safeColors = usedColors.map((color) => `bg-${color}-500`);
 
 /* Because of tailwind's lack of dynamic scripting, we need to
   add all needed translate values to the safelist. *sigh* 
@@ -16,31 +36,38 @@ const safeColors = usedColors.map((color) => `bg-${color}-500` );
   Nothing breaks if it is not big enough - the modal will simply
   pop up to the left to the cursor instead of at the cursor.
 */
-export const cssGridMaxTranslateX = 250;
+export const cssGridMaxTranslateX = 400;
 
 var transXArray: any[] = [];
 for (let count = 0; count < cssGridMaxTranslateX; count++) {
-  transXArray = transXArray.concat(["translate-x-"+count, "translate-y-"+count])
+  transXArray = transXArray.concat([
+    "translate-x-" + count,
+    "translate-y-" + count,
+  ]);
 }
 
 // Now extend the theme to deal with these.
 var trObj: any = {};
 for (let count = 13; count < cssGridMaxTranslateX; count++) {
-  var r = count/4.0;
-  trObj[count.toString()] = r.toString() + 'rem'
+  var r = count / 4.0;
+  trObj[count.toString()] = r.toString() + "rem";
 }
 
 const maxGridRows = 50;
 var gridRowsArray: any[] = [];
 for (let count = 1; count <= maxGridRows; count++) {
-  gridRowsArray = gridRowsArray.concat(["grid-rows-[repeat(" + count.toString() + ",minmax(300px,1fr))]"])
+  gridRowsArray = gridRowsArray.concat([
+    "grid-rows-[repeat(" + count.toString() + ",minmax(300px,1fr))]",
+  ]);
 }
 
 // Widescreen monitor = 4 cols.  Normal monitor = 3. Tablet = 2. Phone = 1
 const maxGridCols = 4;
 var gridColsArray: any[] = [];
 for (let count = 1; count <= maxGridCols; count++) {
-  gridColsArray = gridColsArray.concat(["grid-cols-[repeat(" + count.toString() + ",minmax(100px,1fr))]"])
+  gridColsArray = gridColsArray.concat([
+    "grid-cols-[repeat(" + count.toString() + ",minmax(100px,1fr))]",
+  ]);
 }
 
 console.log("tailwind.config.ts executed.");
@@ -73,16 +100,16 @@ const config = {
     "grid-rows-[repeat(1,30px)]",
     "grid-rows-[repeat(3,30px)]",
     "grid-rows-[repeat(4,30px)]",
-    "grid-rows-[repeat(10,30px)]"
+    "grid-rows-[repeat(10,30px)]",
   ],
   theme: {
     extend: {
-      translate: trObj
+      translate: trObj,
     },
   },
 
   /*  plugins: [‘react-css-modules’] */
   plugins: [require("tailwindcss-animate")],
-}satisfies Config;
+} satisfies Config;
 
 export default config;
