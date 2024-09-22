@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CssGridElement } from "./cssgrid-element.tsx";
 import { computeNumRowsNeeded, moveElement } from "./cssgrid-lib.ts";
 import { computeCssGridModalWidthPx, CssGridModal } from "./cssgrid-modal.tsx";
@@ -14,19 +14,41 @@ import {
 // max number of colums set (numCols).
 export const maxCssGridElemRows = 4;
 
-/* numCols is the fixed number of columns in the grid. 
-   Use 4 for a wide display and 1 for a narrow display (e.g. phone)?
-   Values 1-4 are supported.
-*/
 export function CssGrid({
   getImageFileName,
   gridContents,
-  numCols,
 }: {
   getImageFileName: any;
-  gridContents: any;
-  numCols: any;
+  gridContents: CssGridElInfo[];
 }) {
+  const initialWidth: number =
+    typeof window !== "undefined" ? window.innerWidth : 768;
+
+  const [numCols, setNumCols]: [number, any] = useState(
+    initialWidth <= 768 ? 2 : initialWidth <= 1280 ? 3 : 4
+  );
+
+  console.log("CssGrid: Initially numCols is %d", numCols);
+
+  function detectWindowSize() {
+    let newNumCols: number =
+      window.innerWidth <= 768 ? 2 : window.innerWidth <= 1280 ? 3 : 4;
+    console.log(
+      "CssGrid: innerWidth is %d   numCols is %d",
+      window.innerWidth,
+      newNumCols
+    );
+    setNumCols(newNumCols);
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", detectWindowSize);
+    detectWindowSize();
+    return () => {
+      window.removeEventListener("resize", detectWindowSize);
+    };
+  }, []);
+
   /* Create a local copy in which we bound the size of any element to
    the max number of rows and columns selected for the current window size. */
   let localGridInfo = gridContents.map((info: any) => {
@@ -64,7 +86,11 @@ export function CssGrid({
     );
     let newGridInfo = gridInfo.map((element: CssGridElInfo) => {
       if (element.ID === rightClicked.elemID)
-        return { ...element, cols: rightClicked.cols, rows: rightClicked.rows };
+        return {
+          ...element,
+          cols: rightClicked.cols > numCols ? numCols : rightClicked.cols,
+          rows: rightClicked.rows,
+        };
       else return element;
     });
     setGridInfo(newGridInfo);
