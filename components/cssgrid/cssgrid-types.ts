@@ -18,6 +18,8 @@ export type CssGridModalInfo = {
   y: number;
   cols: number;
   rows: number;
+  elemCols: number;
+  elemRows: number;
 };
 
 export type CssGridStatus =

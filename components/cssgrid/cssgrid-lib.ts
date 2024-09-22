@@ -45,6 +45,7 @@ export function moveElement(
   dstElemID: string,
   gridInfo: CssGridElInfo[]
 ): CssGridElInfo[] {
+  if (srcElemID === dstElemID) return gridInfo;
   // get the src image object
   let srcObj: CssGridElInfo;
   gridInfo.forEach((element: CssGridElInfo) => {
@@ -59,6 +60,24 @@ export function moveElement(
     } else if (element.ID !== srcElemID) newGridInfo.push(element);
   });
   return newGridInfo;
+}
+
+// Return a copy of user's gridinfo that has elements resized to fit
+// within the number of columns actually available.
+
+export function normalizeGridElements(
+  srcGridInfo: CssGridElInfo[],
+  numCols: number
+): CssGridElInfo[] {
+  let normalizedGrid: CssGridElInfo[] = [];
+  srcGridInfo.forEach((info: CssGridElInfo) => {
+    normalizedGrid.push({
+      ...info,
+      cols: +info.cols > numCols ? numCols : +info.cols,
+      rows: +info.cols > numCols && +info.rows > numCols ? numCols : +info.rows,
+    });
+  });
+  return normalizedGrid;
 }
 
 // drop (from Drag and Drop)

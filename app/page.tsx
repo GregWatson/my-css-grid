@@ -1,8 +1,7 @@
 "use client";
 
 import { CssGrid } from "@/components/cssgrid/cssgrid";
-import { getImageFileName, gridContents } from "@/app/data.jsx";
-import { useState } from "react";
+import { getImageFileName, gridContents } from "@/app/data.ts";
 
 export default function Home() {
   return (
