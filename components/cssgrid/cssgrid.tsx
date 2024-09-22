@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CssGridElement } from "./cssgrid-element.tsx";
-import { computeNumRowsNeeded, moveElement } from "./cssgrid-lib.ts";
+import {
+  computeNumRowsNeeded,
+  moveElement,
+  normalizeGridElements,
+} from "./cssgrid-lib.ts";
 import { computeCssGridModalWidthPx, CssGridModal } from "./cssgrid-modal.tsx";
 import {
   CssGridElInfo,
@@ -14,30 +18,49 @@ import {
 // max number of colums set (numCols).
 export const maxCssGridElemRows = 4;
 
-/* numCols is the fixed number of columns in the grid. 
-   Use 4 for a wide display and 1 for a narrow display (e.g. phone)?
-   Values 1-4 are supported.
-*/
 export function CssGrid({
   getImageFileName,
   gridContents,
-  numCols,
 }: {
   getImageFileName: any;
-  gridContents: any;
-  numCols: any;
+  gridContents: CssGridElInfo[];
 }) {
-  /* Create a local copy in which we bound the size of any element to
-   the max number of rows and columns selected for the current window size. */
-  let localGridInfo = gridContents.map((info: any) => {
-    return {
-      ID: info.name,
-      cols: +info.cols > numCols ? numCols : +info.cols,
-      rows: +info.cols > numCols && +info.rows > numCols ? numCols : +info.rows,
-      comment: info.comment,
+  const initialWidth: number =
+    typeof window !== "undefined" ? window.innerWidth : 768;
+  const initialHeight: number =
+    typeof window !== "undefined" ? window.innerHeight : 768;
+
+  const [windowWidth, setWindowWidth] = useState(initialWidth);
+  const [windowHeight, setWindowHeight] = useState(initialWidth);
+
+  const [numCols, setNumCols]: [number, any] = useState(
+    initialWidth <= 768 ? 2 : initialWidth <= 1280 ? 3 : 4
+  );
+
+  function detectWindowSize() {
+    let newNumCols: number =
+      window.innerWidth <= 768 ? 2 : window.innerWidth <= 1280 ? 3 : 4;
+    setWindowWidth(window.innerWidth);
+    setWindowHeight(window.innerHeight);
+    console.log(
+      "CssGrid: innerWidth is %d   numCols is %d",
+      window.innerWidth,
+      newNumCols
+    );
+    setNumCols(newNumCols);
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", detectWindowSize);
+    detectWindowSize();
+    return () => {
+      window.removeEventListener("resize", detectWindowSize);
     };
-  });
-  const [gridInfo, setGridInfo] = useState(localGridInfo);
+  }, []);
+
+  const [gridInfo, setGridInfo] = useState(
+    normalizeGridElements(gridContents, numCols)
+  );
 
   // Status info used by the modal (move, resize etc)
   const [rightClicked, setRightClicked] = useState<CssGridModalInfo>({
@@ -46,6 +69,8 @@ export function CssGrid({
     y: 0,
     cols: 0,
     rows: 0,
+    elemCols: 0,
+    elemRows: 0,
   });
 
   // Info used when reOrdering images via DnD
@@ -57,14 +82,20 @@ export function CssGrid({
   // Event handling. Events cause status to be set, so we process them here.
   if (status === "resizeElement") {
     console.log(
-      "RESIZE IMAGE: image %s  cols:%d  rows:%d",
+      "RESIZE IMAGE: image %s  cols:%d  rows:%d.  Orig was cols:%d rows:%d",
       rightClicked.elemID,
       rightClicked.cols,
-      rightClicked.rows
+      rightClicked.rows,
+      rightClicked.elemCols,
+      rightClicked.elemRows
     );
     let newGridInfo = gridInfo.map((element: CssGridElInfo) => {
       if (element.ID === rightClicked.elemID)
-        return { ...element, cols: rightClicked.cols, rows: rightClicked.rows };
+        return {
+          ...element,
+          cols: rightClicked.cols > numCols ? numCols : rightClicked.cols,
+          rows: rightClicked.rows,
+        };
       else return element;
     });
     setGridInfo(newGridInfo);
@@ -72,7 +103,10 @@ export function CssGrid({
   }
 
   if (status === "moveElement") {
-    let newGridInfo = moveElement(dragSrcElemID, dragDstElemID, gridInfo);
+    let newGridInfo = normalizeGridElements(
+      moveElement(dragSrcElemID, dragDstElemID, gridInfo),
+      numCols
+    );
     setGridInfo(newGridInfo);
     setStatus("noneSelected");
     setdragSrcElemID("");
@@ -85,18 +119,6 @@ export function CssGrid({
     ",minmax(100px,1fr))] grid-rows-[repeat(" +
     numRows.toString() +
     ",minmax(300px,1fr))] gap-1";
-
-  let windowWidth = 1024;
-  let windowHeight = 1024;
-  if (typeof window !== "undefined") {
-    if (window.innerWidth !== undefined && window.innerHeight !== undefined) {
-      windowWidth = window.innerWidth;
-      windowHeight = window.innerHeight;
-    } else {
-      windowWidth = document.documentElement.clientWidth;
-      windowHeight = document.documentElement.clientHeight;
-    }
-  }
 
   const gridElements = gridInfo.map((element: CssGridElInfo) => (
     <CssGridElement

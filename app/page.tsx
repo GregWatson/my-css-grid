@@ -1,7 +1,7 @@
 "use client";
 
 import { CssGrid } from "@/components/cssgrid/cssgrid";
-import { getImageFileName, gridContents } from "@/app/data.jsx";
+import { getImageFileName, gridContents } from "@/app/data.ts";
 
 export default function Home() {
   return (
@@ -9,7 +9,6 @@ export default function Home() {
       <CssGrid
         getImageFileName={getImageFileName}
         gridContents={gridContents}
-        numCols={1}
       />
     </div>
   );

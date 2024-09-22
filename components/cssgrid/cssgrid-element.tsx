@@ -37,7 +37,7 @@ export function CssGridElement({
   cssGridModalWidthPx: number;
 }) {
   let cl =
-    "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800";
+    "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800 min-w-52";
   cl =
     cl +
     " col-span-" +
@@ -86,6 +86,8 @@ export function CssGridElement({
             elemID: element.ID,
             x: X,
             y: Y,
+            elemCols: element.cols,
+            elemRows: element.rows,
           });
           setStatus("modalActive");
         }
