@@ -8,6 +8,13 @@ import {
   CssGridModalInfo,
 } from "./cssgrid-types.ts";
 import { cssGridModalHeightPx } from "./cssgrid-modal.tsx";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 export function CssGridElement({
   element,
@@ -34,8 +41,8 @@ export function CssGridElement({
   windowHeight: number;
   cssGridModalWidthPx: number;
 }) {
-  let cl =
-    "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800 min-w-52";
+  let cl = "min-w-52";
+  // "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800 min-w-52";
   cl =
     cl +
     " col-span-" +
@@ -48,7 +55,7 @@ export function CssGridElement({
   if (status === "isDragging") elementCL += "blur-sm";
 
   return (
-    <div
+    <Card
       id={element.ID}
       key={element.ID}
       className={cl}
@@ -91,31 +98,49 @@ export function CssGridElement({
         }
       }}
     >
-      <img
-        className={elementCL}
-        src={element.url}
-        alt={element.comment}
-        onDragStart={(e) => {
-          e.stopPropagation();
-          console.log("Drag Start %s", element.ID);
-          setdragSrcElemID(element.ID);
-        }}
-        onDragOver={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }} // required
-        onDrop={(e) => {
-          e.stopPropagation();
-          handleOnDrop(element.ID, setdragDstElemID, dragSrcElemID, setStatus);
-        }}
-        onDragEnd={(e) => {
-          e.stopPropagation();
-          handleOnDragEnd(status, setStatus, dragSrcElemID, setdragSrcElemID);
-        }}
-      />
-      <div className="absolute bottom-0 opacity-70 bg-slate-300 min-w-full">
-        {element.comment}
-      </div>
-    </div>
+      <CardContent className="p-0">
+        {element.elType == "image" && (
+          <img
+            className={elementCL}
+            src={element.url}
+            alt={element.comment}
+            onDragStart={(e) => {
+              e.stopPropagation();
+              console.log("Drag Start %s", element.ID);
+              setdragSrcElemID(element.ID);
+            }}
+            onDragOver={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }} // required
+            onDrop={(e) => {
+              e.stopPropagation();
+              handleOnDrop(
+                element.ID,
+                setdragDstElemID,
+                dragSrcElemID,
+                setStatus
+              );
+            }}
+            onDragEnd={(e) => {
+              e.stopPropagation();
+              handleOnDragEnd(
+                status,
+                setStatus,
+                dragSrcElemID,
+                setdragSrcElemID
+              );
+            }}
+          />
+        )}
+        {element.elType == "text" && <p>{element.comment}</p>}
+
+        {element.elType == "image" && element.comment !== "" && (
+          <CardFooter className="p-1 absolute bottom-0 opacity-70 bg-slate-200 min-w-full">
+            {element.comment}
+          </CardFooter>
+        )}
+      </CardContent>
+    </Card>
   );
 }

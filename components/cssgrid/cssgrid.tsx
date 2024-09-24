@@ -20,9 +20,9 @@ export const maxCssGridElemRows = 4;
 
 export function CssGrid({ gridContents }: { gridContents: CssGridElInfo[] }) {
   const initialWidth: number =
-    typeof window !== "undefined" ? window.innerWidth : 768;
+    typeof window !== "undefined" ? window.innerWidth : 1024;
   const initialHeight: number =
-    typeof window !== "undefined" ? window.innerHeight : 768;
+    typeof window !== "undefined" ? window.innerHeight : 1024;
 
   const [windowWidth, setWindowWidth] = useState(initialWidth);
   const [windowHeight, setWindowHeight] = useState(initialWidth);
