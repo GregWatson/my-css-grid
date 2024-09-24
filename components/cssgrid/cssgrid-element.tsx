@@ -11,7 +11,6 @@ import { cssGridModalHeightPx } from "./cssgrid-modal.tsx";
 
 export function CssGridElement({
   element,
-  getImageFileName,
   status,
   setStatus,
   dragSrcElemID,
@@ -24,7 +23,6 @@ export function CssGridElement({
   cssGridModalWidthPx,
 }: {
   element: CssGridElInfo;
-  getImageFileName: any;
   status: CssGridStatus;
   setStatus: any;
   dragSrcElemID: any;
@@ -95,8 +93,8 @@ export function CssGridElement({
     >
       <img
         className={elementCL}
-        src={getImageFileName(element.ID)}
-        alt={"photo of a " + element.ID}
+        src={element.url}
+        alt={element.comment}
         onDragStart={(e) => {
           e.stopPropagation();
           console.log("Drag Start %s", element.ID);
