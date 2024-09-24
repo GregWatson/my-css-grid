@@ -24,6 +24,16 @@ export const gridContents: any[] = [
     comment: "Some comment about the image.",
   },
   {
+    ID: "hawk_desc",
+    elType: "text",
+    cols: 1,
+    rows: 1,
+    comment: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque finibus eros id arcu efficitur 
+      rutrum. Mauris a felis elementum, congue risus eu, tincidunt metus. Fusce pellentesque lacus vitae 
+      orci maximus placerat. Fusce vel nulla ut diam ornare mollis vitae ut metus. Donec in ligula 
+      sollicitudin, tincidunt lectus aliquet, lobortis nulla.`,
+  },
+  {
     ID: "sealion",
     elType: "image",
     cols: 1,
