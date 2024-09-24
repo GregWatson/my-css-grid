@@ -1,3 +1,5 @@
+import { TemplateContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
+
 const TEST_DATA = [
   {
     name: "bird",
@@ -32,7 +34,8 @@ function GridItem({
   }
   return (
     <div
-      className={`${cn} min-h-48 bg-blue-300 flex justify-center items-center border-2 border-slate-400`}
+      className={`${cn} min-h-[40px] bg-blue-300 flex justify-center items-center border-2 border-slate-400`}
+      style={{ gridRow: `span ${rowspan}`, gridColumn: `span ${colspan}` }}
     >
       {name}
       {`${colspan}x${rowspan}`}
@@ -40,11 +43,17 @@ function GridItem({
   );
 }
 
+// I think one key is the "grid-rows..." magic. If you calculate the number of rows you can do
+// it like I did below.
 function CssGrid2() {
+  const rows = 20;
   return (
     <div>
       <h1 className="text-3xl text-center w-full bg-slate-200">CssGrid2</h1>
-      <div className="grid grid-cols-6 grid-rows-[repeat(20,minmax(100px,1fr))] gap-4 w-full">
+      <div
+        className="grid grid-cols-6 gap-4 w-full"
+        style={{ gridTemplateRows: `repeat(${rows},minmax(0px,1fr))` }}
+      >
         <GridItem name="bird" colspan={2} rowspan={2} />
         <GridItem name="bird" colspan={2} rowspan={1} />
         <GridItem name="bird" colspan={1} rowspan={2} />
@@ -60,6 +69,7 @@ function CssGrid2() {
         <GridItem name="bird" colspan={3} rowspan={3} />
         <GridItem name="bird" colspan={1} rowspan={1} />
       </div>
+      <p>End of grid</p>
     </div>
   );
 }
