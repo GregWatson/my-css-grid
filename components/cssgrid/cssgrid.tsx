@@ -110,14 +110,7 @@ export function CssGrid({ gridContents }: { gridContents: CssGridElInfo[] }) {
   let gridClass =
     "grid grid-cols-[repeat(" +
     numCols.toString() +
-    ",minmax(100px,1fr))] " +
-    "grid-rows-[repeat(" +
-    numRows.toString() +
-    ",minmax(300px,1fr))] " +
-    // ********* WHy does following line not work for auto-rows? *****
-    // "grid-auto-rows: minmax(400px, 1fr) " +
-    // ***************************************************************
-    "gap-1";
+    ",minmax(200px,1fr))] gap-1";
 
   const gridElements = gridInfo.map((element: CssGridElInfo) => (
     <CssGridElement
@@ -137,7 +130,10 @@ export function CssGrid({ gridContents }: { gridContents: CssGridElInfo[] }) {
   ));
 
   return (
-    <div className={gridClass}>
+    <div
+      className={gridClass}
+      style={{ gridTemplateRows: `repeat(${numRows},minmax(300px,1fr))` }}
+    >
       {gridElements}
       {status === "modalActive" && (
         <CssGridModal
