@@ -18,13 +18,7 @@ import {
 // max number of colums set (numCols).
 export const maxCssGridElemRows = 4;
 
-export function CssGrid({
-  getImageFileName,
-  gridContents,
-}: {
-  getImageFileName: any;
-  gridContents: CssGridElInfo[];
-}) {
+export function CssGrid({ gridContents }: { gridContents: CssGridElInfo[] }) {
   const initialWidth: number =
     typeof window !== "undefined" ? window.innerWidth : 768;
   const initialHeight: number =
@@ -116,15 +110,19 @@ export function CssGrid({
   let gridClass =
     "grid grid-cols-[repeat(" +
     numCols.toString() +
-    ",minmax(100px,1fr))] grid-rows-[repeat(" +
+    ",minmax(100px,1fr))] " +
+    "grid-rows-[repeat(" +
     numRows.toString() +
-    ",minmax(300px,1fr))] gap-1";
+    ",minmax(300px,1fr))] " +
+    // ********* WHy does following line not work for auto-rows? *****
+    // "grid-auto-rows: minmax(400px, 1fr) " +
+    // ***************************************************************
+    "gap-1";
 
   const gridElements = gridInfo.map((element: CssGridElInfo) => (
     <CssGridElement
       key={element.ID}
       element={element}
-      getImageFileName={getImageFileName}
       status={status}
       setStatus={setStatus}
       dragSrcElemID={dragSrcElemID}

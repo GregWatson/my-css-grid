@@ -1,15 +1,23 @@
 "use client";
 
 import { CssGrid } from "@/components/cssgrid/cssgrid";
-import { getImageFileName, gridContents } from "@/app/data.ts";
-
+import { gridContents } from "@/app/data.ts";
+import { CssGridElInfo } from "@/components/cssgrid/cssgrid-types";
 export default function Home() {
+  const newGridContents: CssGridElInfo[] = gridContents.map((elem) => {
+    return {
+      ID: elem.ID,
+      elType: elem.elType,
+      url: "images/" + elem.ID + ".jpg",
+      cols: elem.cols,
+      rows: elem.rows,
+      comment: elem.comment,
+    };
+  });
+
   return (
     <div className="App">
-      <CssGrid
-        getImageFileName={getImageFileName}
-        gridContents={gridContents}
-      />
+      <CssGrid gridContents={newGridContents} />
     </div>
   );
 }

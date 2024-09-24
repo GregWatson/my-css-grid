@@ -5,6 +5,8 @@
 // Grids are ordered lists of Elements:
 export type CssGridElInfo = {
   ID: string; // Must be unique within this Grid
+  elType: "image" | "text";
+  url: string;
   cols: number;
   rows: number;
   comment: string;
