@@ -48,14 +48,6 @@ export function CssGridImageSizeSelect({
     let elemID = rightClicked.elemID;
     let isCurrentSize: boolean =
       nCols == rightClicked.elemCols && nRows == rightClicked.elemRows;
-    console.log(
-      "nCols:%d(%d)  nRows:%d(%d)   isCurrSize:%s",
-      nCols,
-      rightClicked.elemCols,
-      nRows,
-      rightClicked.elemRows,
-      isCurrentSize.toString()
-    );
     let cl = "rounded-lg border-2 ";
     if (isCurrentSize) {
       cl = cl + "border-slate-200 bg-slate-300";

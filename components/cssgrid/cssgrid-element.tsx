@@ -16,6 +16,10 @@ import {
   CardTitle,
 } from "../ui/card";
 
+import { MoveIcon } from "@radix-ui/react-icons";
+import { GiResize } from "react-icons/gi";
+import { Button } from "@/components/ui/button";
+
 export function CssGridElement({
   element,
   status,
@@ -41,7 +45,7 @@ export function CssGridElement({
   windowHeight: number;
   cssGridModalWidthPx: number;
 }) {
-  let cl = "min-w-52";
+  let cl = "p-0 min-w-52";
   // "rounded-lg border-2 border-slate-400 hover:border-4 hover:border-slate-800 min-w-52";
   cl =
     cl +
@@ -59,81 +63,95 @@ export function CssGridElement({
       id={element.ID}
       key={element.ID}
       className={cl}
-      onClick={() => {
-        if (status === "modalActive" || status === "isDragging") {
-          setStatus("noneSelected");
-        }
-      }}
-      onContextMenu={(e) => {
+      draggable={element.mode == "edit" ? "true" : "false"}
+      onClick={(e) => {
         // User right clicks.
         e.preventDefault(); // prevent the default behaviour when right clicked.
-        // Bring up modal at location of mouse click.
-        // If too far right (offscreen) then move it left.
-        let X = Math.round(e.clientX);
-        if (X + cssGridModalWidthPx > windowWidth) {
-          X = windowWidth - cssGridModalWidthPx;
-        }
-        X = X >> 2; // convert to quad pix unit
-        let Y = Math.round(e.clientY);
-        if (Y + cssGridModalHeightPx > windowHeight) {
-          Y = windowHeight - cssGridModalHeightPx;
-        }
-        Y = Y >> 2; // convert to quad pix unit
-        if (X > cssGridMaxTranslateX) {
-          X = cssGridMaxTranslateX - 1;
-        }
-        if (Y > cssGridMaxTranslateX) {
-          Y = cssGridMaxTranslateX - 1;
-        }
-        if (status === "noneSelected") {
+        if (e.detail === 1) {
+          console.log("Single click on Card %s", element.ID);
+          if (status === "modalActive" || status === "isDragging") {
+            setStatus("noneSelected");
+          }
+        } else if (e.detail === 2) {
+          // double click
+          console.log("Double click on Card %s", element.ID);
+
+          setStatus("toggleEdit");
           setRightClicked({
             ...rightClicked,
             elemID: element.ID,
-            x: X,
-            y: Y,
             elemCols: element.cols,
             elemRows: element.rows,
           });
-          setStatus("modalActive");
         }
       }}
+      onDragStart={(e) => {
+        // e.preventDefault();
+        e.stopPropagation();
+        console.log("Drag Start %s", element.ID);
+        setdragSrcElemID(element.ID);
+      }}
+      onDragOver={(e) => {
+        e.stopPropagation();
+        e.preventDefault(); // required to allow drop
+        console.log("Drag Over %s", element.ID);
+      }}
+      onDrop={(e) => {
+        e.stopPropagation();
+        console.log("Drop %s", element.ID);
+        handleOnDrop(element.ID, setdragDstElemID, dragSrcElemID, setStatus);
+      }}
+      onDragEnd={(e) => {
+        e.stopPropagation();
+        console.log("Drag End %s", element.ID);
+        handleOnDragEnd(status, setStatus, dragSrcElemID, setdragSrcElemID);
+      }}
     >
+      {element.mode == "edit" && (
+        <CardHeader className="z-10 p-0 space-y-0 gap-x-2 absolute top-0  bg-slate-200 flex-row items-baseline">
+          <Button
+            className="bg-slate-50 mt-1 ml-2 mb-1"
+            // variant="outline"
+            size="icon"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log("Resize element %s", element.ID);
+              setStatus("modalActive");
+            }}
+          >
+            <GiResize className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100" />
+          </Button>
+          <Button
+            className="bg-slate-50 mr-2 mb-1"
+            // variant="outline"
+            size="icon"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log("Move element %s", element.ID);
+              setdragSrcElemID(element.ID);
+              setStatus("isDragging");
+            }}
+          >
+            <MoveIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100" />
+          </Button>
+        </CardHeader>
+      )}
       <CardContent className="p-0">
         {element.elType == "image" && (
           <img
             className={elementCL}
             src={element.url}
             alt={element.comment}
-            onDragStart={(e) => {
-              e.stopPropagation();
-              console.log("Drag Start %s", element.ID);
-              setdragSrcElemID(element.ID);
-            }}
-            onDragOver={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }} // required
-            onDrop={(e) => {
-              e.stopPropagation();
-              handleOnDrop(
-                element.ID,
-                setdragDstElemID,
-                dragSrcElemID,
-                setStatus
-              );
-            }}
-            onDragEnd={(e) => {
-              e.stopPropagation();
-              handleOnDragEnd(
-                status,
-                setStatus,
-                dragSrcElemID,
-                setdragSrcElemID
-              );
-            }}
+            draggable={element.mode == "edit" ? "true" : "false"}
           />
         )}
-        {element.elType == "text" && <p>{element.comment}</p>}
+        {element.elType == "text" && (
+          <p draggable={element.mode == "edit" ? "true" : "false"}>
+            {element.comment}{" "}
+          </p>
+        )}
 
         {element.elType == "image" && element.comment !== "" && (
           <CardFooter className="p-1 absolute bottom-0 opacity-70 bg-slate-200 min-w-full">
