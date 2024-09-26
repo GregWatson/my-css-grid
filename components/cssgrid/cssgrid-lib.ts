@@ -33,7 +33,6 @@ export function computeNumRowsNeeded(
     }
   });
   if (colsLeft !== numCols) numRows = numRows + numRowsUsed;
-  console.log("Info: Used %d rows.", numRows);
   return numRows;
 }
 

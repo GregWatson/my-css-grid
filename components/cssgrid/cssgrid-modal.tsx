@@ -11,7 +11,7 @@ export function computeCssGridModalWidthPx(numCols: number): number {
   if (numCols == 3) return 220;
   return 350;
 }
-export const cssGridModalHeightPx = 460;
+export const cssGridModalHeightPx = 370;
 
 export function CssGridModal({
   rightClicked,
@@ -36,16 +36,6 @@ export function CssGridModal({
 
   return (
     <div className={cl} onClick={onModalClose}>
-      <button
-        className="min-w-full p-1 rounded bg-sky-500 text-center  border-2 border-sky-800 hover:border-slate-800 "
-        onClick={(e) => {
-          console.log("Move Button was clicked");
-          setStatus("isDragging");
-        }}
-      >
-        Move Image
-      </button>
-
       <CssGridImageSizeSelect
         rightClicked={rightClicked}
         setRightClicked={setRightClicked}

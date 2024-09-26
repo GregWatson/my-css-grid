@@ -96,6 +96,23 @@ export function CssGrid({ gridContents }: { gridContents: CssGridElInfo[] }) {
     setStatus("noneSelected");
   }
 
+  if (status === "toggleEdit") {
+    console.log("Toggle edit on Card %s", rightClicked.elemID);
+
+    const newGridInfo: CssGridElInfo[] = gridInfo.map(
+      (element: CssGridElInfo) => {
+        if (element.ID === rightClicked.elemID)
+          return {
+            ...element,
+            mode: element.mode == "edit" ? "view" : "edit",
+          };
+        else return element;
+      }
+    );
+    setGridInfo(newGridInfo);
+    setStatus("noneSelected");
+  }
+
   if (status === "moveElement") {
     let newGridInfo = normalizeGridElements(
       moveElement(dragSrcElemID, dragDstElemID, gridInfo),
@@ -111,6 +128,8 @@ export function CssGrid({ gridContents }: { gridContents: CssGridElInfo[] }) {
     "grid grid-cols-[repeat(" +
     numCols.toString() +
     ",minmax(200px,1fr))] gap-1";
+
+  console.log("CssGrid: status is %s", status);
 
   const gridElements = gridInfo.map((element: CssGridElInfo) => (
     <CssGridElement

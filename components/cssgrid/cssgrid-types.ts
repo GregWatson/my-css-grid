@@ -10,6 +10,7 @@ export type CssGridElInfo = {
   cols: number;
   rows: number;
   comment: string;
+  mode: "view" | "edit";
 };
 
 // Info used by pop-up modal to modify size, order, etc.
@@ -29,4 +30,5 @@ export type CssGridStatus =
   | "modalActive"
   | "resizeElement"
   | "isDragging"
-  | "moveElement";
+  | "moveElement"
+  | "toggleEdit";
